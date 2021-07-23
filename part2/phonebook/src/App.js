@@ -1,52 +1,65 @@
 import React, { useState } from 'react'
 
-const Person = ({ person }) => <p>{person.name}: {person.number}</p>
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
 
 const App = () => {
-  const [ persons, setPersons ] = useState([{ name: 'Arto Hellas' }]) 
-  const [ newName, setNewName ] = useState('')
-  const [ newNumber, setNewNumber ] = useState('')
+  const [persons, setPersons] = useState([
+    { name: 'Arto Hellas', number: '040-123456' },
+    { name: 'Ada Lovelace', number: '39-44-5323523' },
+    { name: 'Dan Abramov', number: '12-43-234345' },
+    { name: 'Mary Poppendieck', number: '39-23-6423122' }
+  ])
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [filter, setFilter] = useState('')
+
+  const personList = (filter === '')
+    ? persons
+    : persons.filter(
+      person => person.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase())
+    )
 
   const addNumber = (event) => {
-    event.preventDefault()
-    if(persons.find((person) => person.name === newName )) {
+    event.preventDefault() 
+    
+    if (persons.find((person) => person.name === newName)) {
       window.alert(`${newName} is already added to phonebook`)
     }
-    else if(newName === '') {
-        window.alert('please enter a name with the corresponding number')
-    }
     else {
-    const numberObject = {name: newName, number: newNumber}
-    setPersons(persons.concat(numberObject))
-    setNewName('')
-    setNewNumber('')
+      const numberObject = { name: newName, number: newNumber }
+      setPersons(persons.concat(numberObject))
+      setNewName('')
+      setNewNumber('')
     }
   }
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
-
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value)
+  }
+
+  const handleFilterChange = (event) => {
+    setFilter(event.target.value)
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={addNumber}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Filter filter={filter} onChangeHandler={handleFilterChange} />
+      <h2>Add a new</h2>
+      <PersonForm
+        onSubmitHandler={addNumber}
+        name={newName}
+        onChangeNameHandler={handleNameChange}
+        number={newNumber}
+        onChangeNumberHandler={handleNumberChange}
+      />
       <h2>Numbers</h2>
-        {persons.map(person => <Person key={person.name} person={person} /> )}
+      <Persons persons={personList} />
     </div>
   )
 }
