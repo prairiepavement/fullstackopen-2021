@@ -1,23 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 
 const App = () => {
-  const [persons, setPersons] = useState([])
-
-    useEffect(() => {
-      axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
-    }, [])
-    
+  const [persons, setPersons] = useState([])    
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+
+  useEffect(() => {
+    phoneService
+      .getAll()
+      .then(initialList => {
+        setPersons(initialList)
+      })
+}, [])
 
   const personList = (filter === '')
     ? persons
@@ -33,9 +32,13 @@ const App = () => {
     }
     else {
       const numberObject = { name: newName, number: newNumber }
-      setPersons(persons.concat(numberObject))
-      setNewName('')
-      setNewNumber('')
+        phoneService
+          .create(numberObject)
+          .then(returnedPhone  => {
+            setPersons(persons.concat(returnedPhone))
+            setNewName('')
+            setNewNumber('')
+      })
     }
   }
 
