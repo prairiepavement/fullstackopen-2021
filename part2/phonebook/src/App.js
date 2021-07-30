@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+
+import phoneService from './services/phones'
 
 const App = () => {
   const [persons, setPersons] = useState([])    
@@ -45,12 +46,30 @@ const App = () => {
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
+
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value)
   }
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
+  }
+
+  const handleOnClickDelete = (event) => {
+    const name = event.target.name
+
+    if (window.confirm(`Delete '${name}'?`)) {
+      const id = event.target.value
+        phoneService
+          .del(id)
+          .then((req) => {
+            setPersons(persons.filter(p => p.name !== name))
+          })
+          .catch(error => {
+            alert(`${name} was already deleted`)
+            setPersons(persons.filter(p => p.name !== name))
+          })
+    }
   }
 
   return (
@@ -66,7 +85,7 @@ const App = () => {
         onChangeNumberHandler={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons persons={personList} />
+      <Persons persons={personList} onClickHandler={handleOnClickDelete}/>
     </div>
   )
 }
