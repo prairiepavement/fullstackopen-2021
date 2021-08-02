@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
+
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 
 import phoneService from './services/phones'
 
@@ -10,6 +12,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     phoneService
@@ -35,6 +38,10 @@ const App = () => {
           phoneService
             .update(personInPhonebook.id, replacePerson)
             .then(returnedPerson => {
+
+              setErrorMessage(`'${returnedPerson.name}' updated successfully`)
+              setTimeout(() => {setErrorMessage(null)}, 5000)
+
               setPersons(persons.map(person => person.name !== personInPhonebook.name ? person : replacePerson))
               setNewName('')
               setNewNumber('')
@@ -47,6 +54,10 @@ const App = () => {
         phoneService
           .create(numberObject)
           .then(returnedPhone  => {
+
+            setErrorMessage(`Added '${returnedPhone.name}'`)
+            setTimeout(() => {setErrorMessage(null)}, 5000)
+
             setPersons(persons.concat(returnedPhone))
             setNewName('')
             setNewNumber('')
@@ -86,6 +97,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} />
       <Filter filter={filter} onChangeHandler={handleFilterChange} />
       <h2>Add a new</h2>
       <PersonForm
