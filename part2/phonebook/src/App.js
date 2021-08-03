@@ -4,6 +4,7 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import Notification from './components/Notification'
+import Error from './components/Error'
 
 import phoneService from './services/phones'
 
@@ -12,6 +13,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
@@ -39,12 +41,17 @@ const App = () => {
             .update(personInPhonebook.id, replacePerson)
             .then(returnedPerson => {
 
-              setErrorMessage(`'${returnedPerson.name}' updated successfully`)
-              setTimeout(() => {setErrorMessage(null)}, 5000)
+              setNotificationMessage(`'${returnedPerson.name}' updated successfully`)
+              setTimeout(() => {setNotificationMessage(null)}, 5000)
 
               setPersons(persons.map(person => person.name !== personInPhonebook.name ? person : replacePerson))
               setNewName('')
               setNewNumber('')
+            })
+            .catch(error => {
+              setErrorMessage(`The number of '${personInPhonebook.name}' was removed from server`)
+              setTimeout(() => {setErrorMessage(null)}, 5000)
+              setPersons(persons.filter(p => p.name !== personInPhonebook.name))
             })
         }
       }
@@ -55,8 +62,8 @@ const App = () => {
           .create(numberObject)
           .then(returnedPhone  => {
 
-            setErrorMessage(`Added '${returnedPhone.name}'`)
-            setTimeout(() => {setErrorMessage(null)}, 5000)
+            setNotificationMessage(`Added '${returnedPhone.name}'`)
+            setTimeout(() => {setNotificationMessage(null)}, 5000)
 
             setPersons(persons.concat(returnedPhone))
             setNewName('')
@@ -85,10 +92,13 @@ const App = () => {
         phoneService
           .del(id)
           .then((req) => {
+            setNotificationMessage(`'${name}' deleted successfully`)
+            setTimeout(() => {setNotificationMessage(null)}, 5000)
             setPersons(persons.filter(p => p.name !== name))
           })
           .catch(error => {
-            alert(`${name} was already deleted`)
+            setErrorMessage(`The number of '${name}' has already been removed from server`)
+            setTimeout(() => {setErrorMessage(null)}, 5000)
             setPersons(persons.filter(p => p.name !== name))
           })
     }
@@ -97,7 +107,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} />
+      <Notification message={notificationMessage} />
+      <Error message={errorMessage} />
       <Filter filter={filter} onChangeHandler={handleFilterChange} />
       <h2>Add a new</h2>
       <PersonForm
