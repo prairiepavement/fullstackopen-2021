@@ -49,9 +49,10 @@ const App = () => {
               setNewNumber('')
             })
             .catch(error => {
-              setErrorMessage(`The number of '${personInPhonebook.name}' was removed from server`)
-              setTimeout(() => {setErrorMessage(null)}, 5000)
-              setPersons(persons.filter(p => p.name !== personInPhonebook.name))
+              setErrorMessage(`${error.response.data.error}`)
+              setTimeout(() => {
+                setErrorMessage(null)
+              }, 5000)
             })
         }
       }
@@ -68,6 +69,12 @@ const App = () => {
             setPersons(persons.concat(returnedPhone))
             setNewName('')
             setNewNumber('')
+          })
+          .catch(error => {
+            setErrorMessage(`${error.response.data.error}`)
+            setTimeout(() => {
+              setErrorMessage(null)
+          }, 5000)
       })
     }
   }
