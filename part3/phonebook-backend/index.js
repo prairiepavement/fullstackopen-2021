@@ -11,9 +11,9 @@ app.use(cors())
 app.use(express.json())
 
 morgan.token('post', (request, response) => {
-  if (request.method === 'POST') 
+  if (request.method === 'POST')
     return JSON.stringify(request.body)
-  
+
   return ' '
 })
 
@@ -36,20 +36,20 @@ app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
     .then(person => {
       if (person) {
-      response.json(person)
+        response.json(person)
       } else {
-      response.status(404).end()
+        response.status(404).end()
       }
     })
     .catch(error => next(error))
-  })
+})
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then(response.status(204).end())
     .catch(error => next(error))
 })
-  
+
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
@@ -57,13 +57,13 @@ app.post('/api/persons', (request, response, next) => {
     name: body.name,
     number: body.number
   })
-  
+
   person.save()
-  .then(savedPerson => savedPerson.toJSON())
-  .then(savedAndFormattedPerson => {
-    response.json(savedAndFormattedPerson)
-  })
-  .catch(error => next(error))
+    .then(savedPerson => savedPerson.toJSON())
+    .then(savedAndFormattedPerson => {
+      response.json(savedAndFormattedPerson)
+    })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -105,5 +105,5 @@ app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
